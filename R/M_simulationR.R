@@ -215,7 +215,7 @@ M_simulationR <- function(data, current_variables, starting_proportion = 0.5,
     stop("Argument 'sampling_rule' is not valid")
   }
 
-  n <- raster::nlayers(current_variables)
+  n <- terra::nlayers(current_variables)
   if (n < 2) {
     stop("At least 2 variables are needed in 'current_variables'")
   }
@@ -281,7 +281,7 @@ M_simulationR <- function(data, current_variables, starting_proportion = 0.5,
     write_ellmeta(suit_mod, emodfile)
 
     s_name <- paste0(suit_fol, "/suitability", ftype)
-    raster::writeRaster(suit_layer, filename = s_name, format = out_format)
+    terra::writeRaster(suit_layer, filename = s_name, format = out_format)
 
     suit_name <- normalizePath(s_name)
 
@@ -319,10 +319,10 @@ M_simulationR <- function(data, current_variables, starting_proportion = 0.5,
     write_ellmeta(suit_mod, emodfile)
 
     s_name <- paste0(suit_fol, "/suitability_current", ftype)
-    raster::writeRaster(suit_layer, filename = s_name, format = out_format)
+    terra::writeRaster(suit_layer, filename = s_name, format = out_format)
 
     l_name <- paste0(suit_fol, "/suitability_lgm", ftype)
-    raster::writeRaster(suit_lgm, filename = l_name, format = out_format)
+    terra::writeRaster(suit_lgm, filename = l_name, format = out_format)
 
     ## names for later
     sp_name <- normalizePath(s_name)
@@ -344,7 +344,7 @@ M_simulationR <- function(data, current_variables, starting_proportion = 0.5,
   # --------
   # occurrences in suitable areas, starting scenario of simulation
   occ_suit <- suit_mod[[1]][, 1:2]
-  suit_lay <- raster::raster(suit_name[1])
+  suit_lay <- terra::rast(suit_name[1])
   oca <- data.frame(Species = sp_nam, occ_suit)
   oca <- suitable_cells(suit_lay, data = oca)
 
