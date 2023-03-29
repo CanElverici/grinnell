@@ -272,7 +272,7 @@ scenario_wise_simulation <- function(data, suit_layers, starting_proportion = 0.
                                      output_directory) {
 
   # initial values
-  cur_layer <- raster::raster(suit_layers[length(suit_layers)])
+  cur_layer <- terra::rast(suit_layers[length(suit_layers)])
   l_meta <- layer_metadata(cur_layer)
   layer_dim <- l_meta$layer_dim
 
@@ -301,8 +301,8 @@ scenario_wise_simulation <- function(data, suit_layers, starting_proportion = 0.
   for (i in 1:length(suit_layers)) {
     message("  Scenario ", i, " of ", length(suit_layers), appendLF = FALSE)
 
-    s <- raster::raster(suit_layers[i])
-    S <- raster::as.matrix(s)
+    s <- terra::rast(suit_layers[i])
+    S <- terra::as.matrix(s)
 
     ## loop for all replicates
     message(" - Replicate:", appendLF = FALSE)
@@ -419,8 +419,8 @@ scenario_wise_simulation <- function(data, suit_layers, starting_proportion = 0.
       aname <- paste0(output_directory, "/A_classified", form1)
       cname <- paste0(output_directory, "/C_classified", form1)
 
-      raster::writeRaster(a_when, filename = aname, format = raster_format)
-      raster::writeRaster(c_when, filename = cname, format = raster_format)
+      terra::writeRaster(a_when, filename = aname, format = raster_format)
+      terra::writeRaster(c_when, filename = cname, format = raster_format)
     }
 
     res <- list(Summary = summ, A = Amvb[[3]], A_mean = Amvb[[1]],
@@ -432,7 +432,7 @@ scenario_wise_simulation <- function(data, suit_layers, starting_proportion = 0.
 
       if (write_to_directory == TRUE) {
         aname <- paste0(output_directory, "/A_scenarios", form1)
-        raster::writeRaster(a_when, filename = aname, format = raster_format)
+        terra::writeRaster(a_when, filename = aname, format = raster_format)
       }
 
       res <- list(Summary = summ, A = Amvb[[3]], A_mean = Amvb[[1]],
@@ -444,7 +444,7 @@ scenario_wise_simulation <- function(data, suit_layers, starting_proportion = 0.
 
       if (write_to_directory == TRUE) {
         cname <- paste0(output_directory, "/C_scenarios", form1)
-        raster::writeRaster(c_when, filename = cname, format = raster_format)
+        terra::writeRaster(c_when, filename = cname, format = raster_format)
       }
 
       res <- list(Summary = summ, A = NULL, A_mean = NULL, A_var = NULL,
@@ -481,7 +481,7 @@ event_wise_simulation <- function(data, suit_layers, starting_proportion = 0.5,
                                   raster_format = "GTiff", output_directory) {
 
   # initial values
-  cur_layer <- raster::raster(suit_layers[length(suit_layers)])
+  cur_layer <- terra::rast(suit_layers[length(suit_layers)])
   l_meta <- layer_metadata(cur_layer)
   layer_dim <- l_meta$layer_dim
 
@@ -510,8 +510,8 @@ event_wise_simulation <- function(data, suit_layers, starting_proportion = 0.5,
   for (i in 1:length(suit_layers)) {
     message("  Scenario ", i, " of ", length(suit_layers), appendLF = FALSE)
 
-    s <- raster::raster(suit_layers[i])
-    S <- raster::as.matrix(s)
+    s <- terra::rast(suit_layers[i])
+    S <- terra::as.matrix(s)
 
     ## loop for all steps
     message(" - D. event:", appendLF = FALSE)
@@ -623,8 +623,8 @@ event_wise_simulation <- function(data, suit_layers, starting_proportion = 0.5,
       aname <- paste0(output_directory, "/A_classified", form1)
       cname <- paste0(output_directory, "/C_classified", form1)
 
-      raster::writeRaster(a_when, filename = aname, format = raster_format)
-      raster::writeRaster(c_when, filename = cname, format = raster_format)
+      terra::writeRaster(a_when, filename = aname, format = raster_format)
+      terra::writeRaster(c_when, filename = cname, format = raster_format)
     }
 
     res <- list(Summary = summ, A_events = a_when, C_events = c_when)
@@ -634,7 +634,7 @@ event_wise_simulation <- function(data, suit_layers, starting_proportion = 0.5,
 
       if (write_to_directory == TRUE) {
         aname <- paste0(output_directory, "/A_events", form1)
-        raster::writeRaster(a_when, filename = aname, format = raster_format)
+        terra::writeRaster(a_when, filename = aname, format = raster_format)
       }
 
       res <- list(Summary = summ, A_events = a_when, C_events = NULL)
@@ -644,7 +644,7 @@ event_wise_simulation <- function(data, suit_layers, starting_proportion = 0.5,
 
       if (write_to_directory == TRUE) {
         cname <- paste0(output_directory, "/C_events", form1)
-        raster::writeRaster(c_when, filename = cname, format = raster_format)
+        terra::writeRaster(c_when, filename = cname, format = raster_format)
       }
 
       res <- list(Summary = summ, A_events = NULL, C_events = c_when)
