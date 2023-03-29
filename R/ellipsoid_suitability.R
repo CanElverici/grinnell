@@ -75,7 +75,7 @@ ellipsoid_suitability <- function(data, variables, suitability_threshold = 5,
   }
 
   # raster and data processing
-  occ_data <- na.omit(raster::extract(variables, data))
+  occ_data <- na.omit(terra::extract(variables, data))
   centroid <- colMeans(occ_data)
 
   covariance <- cov(occ_data)
@@ -88,7 +88,7 @@ ellipsoid_suitability <- function(data, variables, suitability_threshold = 5,
                                        tolerance = tolerance)
 
     # occurrences for results
-    suit <- na.omit(raster::extract(suit_model[[4]], data))
+    suit <- na.omit(terra::extract(suit_model[[4]], data))
     occ_comp <- cbind(data, occ_data, suit)
     colnames(occ_comp) <- c("Longitude", "Latitude", names(variables), "Suitability")
 
@@ -137,7 +137,7 @@ ellipsoid_suitability <- function(data, variables, suitability_threshold = 5,
     names(suit_layer) <- suit_names
 
     # occurrences for results
-    suit <- na.omit(raster::extract(suit_layer[[1]], data))
+    suit <- na.omit(terra::extract(suit_layer[[1]], data))
     occ_comp <- cbind(data, occ_data, suit)
     colnames(occ_comp) <- c("Longitude", "Latitude", names(variables), "Suitability")
 
