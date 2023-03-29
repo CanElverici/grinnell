@@ -26,7 +26,7 @@ save_nicheplot <- function(ellipsoid_model, suitability_threshold, variables,
   el <- ellipse::ellipse(x = ellipsoid_model[[3]], centre = ellipsoid_model[[2]],
                          level = (100 - suitability_threshold) / 100)
 
-  background <- na.omit(raster::values(variables[[1:2]]))
+  background <- na.omit(terra::values(variables[[1:2]]))
   nr <- nrow(background)
   if (nr > 5000) {background <- background[sample(nr, size = 5000), ]}
 
@@ -51,9 +51,9 @@ save_nicheplot <- function(ellipsoid_model, suitability_threshold, variables,
 # metadata from base raster layer
 layer_metadata <- function(layer) {
   return(list(
-    NW_vertex = raster::extent(layer)[c(4, 1)],
-    cell_size = raster::res(layer)[1],
-    layer_dim = c(raster::nrow(layer), raster::ncol(layer))
+    NW_vertex = terra::ext(layer)[c(4, 1)],
+    cell_size = terra::res(layer)[1],
+    layer_dim = c(terra::nrow(layer), terra::ncol(layer))
   ))
 }
 
@@ -61,7 +61,7 @@ layer_metadata <- function(layer) {
 # prepare S matrix from base raster
 base_matrix <- function(layer) {
   return(
-    matrix(layer[], nrow = raster::nrow(layer), ncol = raster::ncol(layer),
+    matrix(layer[], nrow = terra::nrow(layer), ncol = terra::ncol(layer),
            byrow = TRUE)
   )
 }
@@ -143,15 +143,15 @@ rformat_type <- function(format) {
 # write raster layers of simulation results
 write_stats <- function(rep_stat_list, names, format, directory) {
   format1 <- rformat_type(format)
-  raster::writeRaster(
+  terra::writeRaster(
     rep_stat_list[[1]], filename = paste0(directory, "/", names[1], format1),
     format = format
   )
-  raster::writeRaster(
+  terra::writeRaster(
     rep_stat_list[[2]], filename = paste0(directory, "/", names[2], format1),
     format = format
   )
-  raster::writeRaster(
+  terra::writeRaster(
     rep_stat_list[[3]], filename = paste0(directory, "/", names[3], format1),
     format = format
   )
@@ -163,17 +163,17 @@ write_stats <- function(rep_stat_list, names, format, directory) {
 M_preparation <- function(directory, A_bin = NULL, A_name = NULL,
                           raster_format = "GTiff") {
   if (is.null(A_bin) & !is.null(A_name)) {
-    A_bin <- raster::raster(paste0(directory, "/", A_name))
+    A_bin <- terra::rast(paste0(directory, "/", A_name))
   }
 
   A_bin[A_bin[] == 0] <- NA
-  A_bin <- raster::trim(A_bin)
-  shpm <- raster::rasterToPolygons(A_bin, dissolve = TRUE)
-  sp::proj4string(shpm) <- A_bin@crs
+  A_bin <- terra::trim(A_bin)
+  shpm <- terra::vect(A_bin, values = TRUE, dissolve = TRUE)
+  terra::crs(shpm) <- terra::crs(A_bin)
 
-  rgdal::writeOGR(shpm, directory, "accessible_area_M", driver = "ESRI Shapefile")
+  sf::write_sf(shpm, paste0(directory, "/accessible_area_M.shp"))
   m_name <- paste0(directory, "/accessible_area_M", rformat_type(raster_format))
-  raster::writeRaster(A_bin, filename = m_name, format = raster_format)
+  terra::writeRaster(A_bin, filename = m_name, format = raster_format)
 
   return(list(A_bin, shpm))
 }
@@ -194,17 +194,16 @@ t_col <- function(col, alpha = 1, names = NULL) {
 # saves plot of accessed areas (M) after simulation is done
 save_Mplot <- function(ellipsoid_model, suitability_layer, M_polygon,
                        size_proportion = 0.55, output_directory) {
-  boxpam <- t(matrix(suitability_layer@extent, 2, byrow = T))
-  boxpam <- sp::SpatialPointsDataFrame(boxpam, data.frame(boxpam),
-                                       proj4string = M_polygon@proj4string)
-
+  boxpam <- t(matrix(terra::ext(suitability_layer), 2, byrow = T))
+  boxpam <- sf::st_as_sf(data.frame(boxpam), coords = 1:2, crs = sf::st_crs(M_polygon))
+  
   png(paste0(output_directory, "/Accessible_area_M.png"), width = 80, height = 80,
       units = "mm", res = 600)
   par(mar = c(0.5, 0.5, 0.5, 0.5), cex = size_proportion)
-  sp::plot(boxpam, col = NA)
-  raster::image(suitability_layer, col = rev(terrain.colors(255)),
+  plot(boxpam, col = NA)
+  terra::image(suitability_layer, col = rev(terrain.colors(255)),
                 axes = FALSE, add = TRUE)
-  sp::plot(M_polygon, lwd = 1, border = "blue4", add = TRUE)
+  plot(M_polygon, lwd = 1, border = "blue4", add = TRUE)
   points(ellipsoid_model[[1]][, 1:2], pch = 16, cex = 0.6)
   box()
   dev.off()
@@ -215,28 +214,28 @@ save_Mplot <- function(ellipsoid_model, suitability_layer, M_polygon,
 # saves plot results from event - wise simulation
 save_event_plot <- function(data, event_simulation_results, barriers = NULL,
                             size_proportion = 0.55, output_directory) {
-
+  
   cola <- t_col("black", 0.5)
-
+  
   png(paste0(output_directory, "/Accessed_colonized_per_event.png"),
       width = 166, height = 80, units = "mm", res = 600)
-
+  
   par(mfrow = c(1, 2), mar = c(0.5, 0.5, 1, 1))
   par(cex = size_proportion)
-  raster::plot(event_simulation_results$A_events, main = "Accessed areas",
-               axes = FALSE, legend = FALSE)
+  terra::plot(event_simulation_results$A_events, main = "Accessed areas",
+              axes = FALSE, legend = FALSE)
   if (!is.null(barriers)) {
-    raster::image(barriers, col = cola, axes = FALSE, add = TRUE)
+    terra::image(barriers, col = cola, axes = FALSE, add = TRUE)
   }
   points(data[, 2:3], pch = 16, cex = 0.3)
-
+  
   par(cex = size_proportion)
-  raster::plot(event_simulation_results$C_events, main = "Colonized areas",
-               axes = FALSE)
+  terra::plot(event_simulation_results$C_events, main = "Colonized areas",
+              axes = FALSE)
   if (!is.null(barriers)) {
-    raster::image(barriers, col = cola, axes = FALSE, add = TRUE)
+    terra::image(barriers, col = cola, axes = FALSE, add = TRUE)
   }
   points(data[, 2:3], pch = 16, cex = 0.3)
-
+  
   dev.off()
 }
