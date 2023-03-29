@@ -85,7 +85,7 @@ interpolation <- function(ellipsoid_model, suitability_threshold = 5,
         pc_inter[[j]] <- (current_variables[[j]] * (1 - spot_val)) +
           (projection_variables[[j]] * spot_val)
       }
-      pc_inter <- do.call(raster::stack, pc_inter)
+      pc_inter <- do.call(terra::rast, pc_inter)
 
       ## suitability projections
       suit_p <- predict_esuitability(ellipsoid_model = ellipsoid_model,
@@ -102,7 +102,7 @@ interpolation <- function(ellipsoid_model, suitability_threshold = 5,
       ## write suitability layer other scenarios
       ip_name <- paste0(output_directory, "/suitability_interpolation", i,
                         rformat_type(out_format))
-      raster::writeRaster(suit_p, ip_name, format = out_format)
+      terra::writeRaster(suit_p, ip_name, format = out_format)
 
       suit_name[i] <- normalizePath(ip_name)
 
