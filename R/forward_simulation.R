@@ -161,7 +161,7 @@ forward_simulation <- function(suit_layer, data = NULL, suit_forward = NULL,
     stop("Argument 'sampling_rule' is not valid")
   }
   if (!is.null(barriers)) {
-    suit_lay <- raster::raster(suit_layer)
+    suit_lay <- terra::rast(suit_layer)
     if (suit_lay@extent != barriers@extent) {
       stop("'barriers' and 'suit_layer' must have the same extent")
     }
@@ -206,7 +206,7 @@ forward_simulation <- function(suit_layer, data = NULL, suit_forward = NULL,
       suit_lay <- suit_lay * barr
 
       s_name <- paste0(suit_fol, "/suitability", ftype)
-      raster::writeRaster(suit_lay, filename = s_name, format = out_format)
+      terra::writeRaster(suit_lay, filename = s_name, format = out_format)
 
       suit_name <- normalizePath(s_name)
 
@@ -215,12 +215,12 @@ forward_simulation <- function(suit_layer, data = NULL, suit_forward = NULL,
       len <- length(suits)
       suit_name <- vapply(1:len, FUN.VALUE = character(1), function(x) {
         if (x > 1) {
-          suit_lay <- raster::raster(suits[x])
+          suit_lay <- terra::rast(suits[x])
         }
         suit_lay <- suit_lay * barr
 
         s_name <- paste0(suit_fol, "/suitability", x, ftype)
-        raster::writeRaster(suit_lay, filename = s_name, format = out_format)
+        terra::writeRaster(suit_lay, filename = s_name, format = out_format)
 
         normalizePath(s_name)
       })
@@ -234,7 +234,7 @@ forward_simulation <- function(suit_layer, data = NULL, suit_forward = NULL,
   }
 
   ## occurrences relevant for simulation, defining initial points if data = NULL
-  suit_lay <- raster::raster(suit_name[1])
+  suit_lay <- terra::rast(suit_name[1])
   data <- suitable_cells(suit_lay, data = data)
 
   ## write relevant records
