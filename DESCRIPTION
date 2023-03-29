@@ -34,7 +34,7 @@ Imports:
     ellipse (>= 0.4),
     graphics,
     grDevices,
-    raster (>= 2.6),
+    terra (>= 0.2),
     rgdal (>= 1.4),
     rgeos (>= 0.3),
     sp (>= 1.2),
