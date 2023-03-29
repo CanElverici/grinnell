@@ -96,7 +96,7 @@ pca_raster <- function(variables, in_format = NULL, scale = TRUE, center = TRUE,
   if (clsv == "character") {
     patt <- paste0(rformat_type(in_format), "$")
     var <- list.files(variables, pattern = patt, full.names = TRUE)
-    variables <- raster::stack(var)
+    variables <- terra::rast(var)
   }
   var_points <- na.omit(variables[])
   pcra <- variables[[1]]
@@ -115,12 +115,12 @@ pca_raster <- function(variables, in_format = NULL, scale = TRUE, center = TRUE,
 
     if (write_to_directory == TRUE) {
       filenam <- paste0(pca_fol, "/PC", i, patt1)
-      raster::writeRaster(pcra, filenam, format = out_format)
+      terra::writeRaster(pcra, filenam, format = out_format)
     }
   }
 
-  pcras <- do.call(raster::stack, pcras)
-  names(pcras) <- paste0("PC", 1:(raster::nlayers(pcras)))
+  pcras <- do.call(terra::rast, pcras)
+  names(pcras) <- paste0("PC", 1:(terra::nlayers(pcras)))
 
   SumPCAMat <- summary(pca)$importance
 
@@ -158,7 +158,7 @@ pca_raster <- function(variables, in_format = NULL, scale = TRUE, center = TRUE,
     for (h in 1:length(proj_dirs)) {
       if (clspr == "character") {
         pvar <- list.files(proj_dirs[h], pattern = patt, full.names = TRUE)
-        projection_variables <- raster::stack(pvar)
+        projection_variables <- terra::rast(pvar)
       }
       pcra <- projection_variables[[1]]
       to_fillp <- !is.na(pcra[])
@@ -178,13 +178,13 @@ pca_raster <- function(variables, in_format = NULL, scale = TRUE, center = TRUE,
 
         if (write_to_directory == TRUE) {
           filenam <- paste0(fol_names[h], "/PC", i, patt1)
-          raster::writeRaster(pcra, filenam, format = out_format)
+          terra::writeRaster(pcra, filenam, format = out_format)
         }
       }
 
       if (return_projection == TRUE) {
-        ppcrass[[h]] <- do.call(raster::stack, ppcras)
-        names(ppcrass[[h]]) <- paste0("PC", 1:(raster::nlayers(ppcrass[[h]])))
+        ppcrass[[h]] <- do.call(terra::rast, ppcras)
+        names(ppcrass[[h]]) <- paste0("PC", 1:(terra::nlayers(ppcrass[[h]])))
       }
     }
 
